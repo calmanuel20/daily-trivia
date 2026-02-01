@@ -119,3 +119,15 @@ export const deleteSubmission = (submissionId) => {
     return false;
   }
 };
+
+// Clear all localStorage data
+export const clearAllData = () => {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(SUBMISSIONS_KEY);
+    return true;
+  } catch (error) {
+    console.error('Error clearing localStorage:', error);
+    return false;
+  }
+};

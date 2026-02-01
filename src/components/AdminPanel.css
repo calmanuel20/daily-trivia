@@ -263,8 +263,10 @@
 
 .admin-tabs {
   display: flex;
+  align-items: center;
   border-bottom: 2px solid #333;
   padding: 0 30px;
+  gap: 10px;
 }
 
 .admin-tab {
@@ -287,6 +289,24 @@
 .admin-tab.active {
   color: #6c63ff;
   border-bottom-color: #6c63ff;
+}
+
+.admin-clear-btn {
+  margin-left: auto;
+  padding: 10px 20px;
+  background: #dc3545;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.admin-clear-btn:hover {
+  background: #c82333;
+  transform: translateY(-2px);
 }
 
 .admin-submissions-content {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './AdminPanel.css';
-import { getSubmissions, deleteSubmission } from '../utils/storage';
+import { getSubmissions, deleteSubmission, clearAllData } from '../utils/storage';
 
 const ADMIN_PASSWORD = 'pooppoop';
 
@@ -185,6 +185,19 @@ const AdminPanel = ({ onClose, onSave }) => {
             onClick={() => setActiveTab('submissions')}
           >
             Submissions ({submissions.length})
+          </button>
+          <button
+            className="admin-clear-btn"
+            onClick={() => {
+              if (window.confirm('Are you sure you want to clear ALL localStorage data? This cannot be undone.')) {
+                clearAllData();
+                alert('All data cleared! Page will reload.');
+                window.location.reload();
+              }
+            }}
+            title="Clear All Data"
+          >
+            🗑️ Clear Data
           </button>
         </div>
 

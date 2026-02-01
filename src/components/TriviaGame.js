@@ -4,8 +4,7 @@ import AnswerListModal from './AnswerListModal';
 import AutocompleteInput from './AutocompleteInput';
 import AdminPanel from './AdminPanel';
 import QuestionSubmission from './QuestionSubmission';
-import { getTodaysPrompt, savePrompt } from '../utils/storage';
-import { saveSubmission } from '../utils/storage';
+import { getTodaysPrompt, savePrompt, saveSubmission } from '../utils/storage';
 
 const TriviaGame = () => {
   const [prompt, setPrompt] = useState(null);
@@ -55,8 +54,6 @@ const TriviaGame = () => {
   // Handle answer submission
   const handleSubmit = (answer) => {
     if (!answer || gameOver || gameWon) return;
-
-    const normalizedInput = normalizeAnswer(answer);
     
     if (isAlreadyGuessed(answer)) {
       alert('You already guessed that answer!');
@@ -67,14 +64,14 @@ const TriviaGame = () => {
 
     if (position) {
       // Correct answer - reveal it in its position
-      setRevealedPositions(prev => ({
-        ...prev,
+      const newRevealed = {
+        ...revealedPositions,
         [position]: prompt.answers[position - 1]
-      }));
+      };
+      setRevealedPositions(newRevealed);
 
       // Check if all 10 answers have been found
-      const revealedCount = Object.keys(revealedPositions).length + 1;
-      if (revealedCount === 10) {
+      if (Object.keys(newRevealed).length === 10) {
         setGameWon(true);
         setGameOver(true);
       }
@@ -119,29 +116,24 @@ const TriviaGame = () => {
     saveSubmission(submission);
   };
 
-  // Generate share text (similar to Wordle) - without revealing answers
+  // Generate share text in grid format
   const generateShareText = () => {
-    const correctCount = Object.keys(revealedPositions).length;
-    const totalGuesses = correctCount + incorrectGuesses.length;
-    const livesUsed = 5 - lives;
+    const today = new Date().toISOString().split('T')[0];
+    const dateStr = new Date(today).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     
-    let shareText = `Daily Fuck - ${prompt.question}\n\n`;
-    shareText += `Found ${correctCount}/10 answers\n`;
-    shareText += `Guesses: ${totalGuesses} | Lives used: ${livesUsed}/5\n\n`;
+    let shareText = `DailyFarts ${dateStr}\n\n`;
     
-    // Show answer grid without revealing answers
+    // Create grid of 2 columns, 5 rows
+    const results = [];
     for (let i = 1; i <= 10; i++) {
-      if (revealedPositions[i]) {
-        shareText += `${i}. ✅\n`;
-      } else {
-        shareText += `${i}. ⬜\n`;
-      }
+      results.push(revealedPositions[i] ? '🏆' : '❌');
     }
     
-    if (gameWon) {
-      shareText += '\n🎉 Perfect!';
-    } else if (gameOver) {
-      shareText += '\n💔 Game Over';
+    // Format as 2 columns, 5 rows
+    for (let row = 0; row < 5; row++) {
+      const left = results[row * 2];
+      const right = results[row * 2 + 1];
+      shareText += `${left}    ${right}\n`;
     }
     
     return shareText;
@@ -174,7 +166,7 @@ const TriviaGame = () => {
   return (
     <div className="trivia-game">
       <header className="game-header">
-        <h1>Daily Fuck</h1>
+        <h1>Daily Fart</h1>
         <div className="header-actions">
           <button
             className="admin-btn"
@@ -182,13 +174,6 @@ const TriviaGame = () => {
             title="Admin Panel"
           >
             ⚙️
-          </button>
-          <button
-            className="answer-list-btn"
-            onClick={() => setShowAnswerList(true)}
-            title="View all answers"
-          >
-            📋
           </button>
           {(gameOver || gameWon) && (
             <button className="share-btn" onClick={handleShare}>
@@ -241,14 +226,23 @@ const TriviaGame = () => {
 
         {!gameOver && !gameWon && (
           <form onSubmit={handleFormSubmit} className="input-section">
-            <AutocompleteInput
-              value={inputValue}
-              onChange={setInputValue}
-              onSubmit={handleSubmit}
-              allPossibleAnswers={allPossibleAnswers}
-              guessedAnswers={Object.values(revealedPositions)}
-              disabled={false}
-            />
+            <div className="input-with-answers-btn">
+              <AutocompleteInput
+                value={inputValue}
+                onChange={setInputValue}
+                onSubmit={handleSubmit}
+                allPossibleAnswers={allPossibleAnswers}
+                guessedAnswers={Object.values(revealedPositions)}
+              />
+              <button
+                type="button"
+                className="answer-list-btn-inline"
+                onClick={() => setShowAnswerList(true)}
+                title="View all answers"
+              >
+                📋
+              </button>
+            </div>
             <button type="submit" className="submit-btn">
               Submit
             </button>

@@ -13,7 +13,6 @@ const AutocompleteInput = ({
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const inputRef = useRef(null);
-  const dropdownRef = useRef(null);
 
   const normalize = (str) => str.toLowerCase().trim();
 
@@ -121,7 +120,7 @@ const AutocompleteInput = ({
           autoComplete="off"
         />
         {showDropdown && filteredAnswers.length > 0 && (
-          <div ref={dropdownRef} className="autocomplete-dropdown">
+          <div className="autocomplete-dropdown">
             {filteredAnswers.map((answer, index) => (
               <div
                 key={index}
